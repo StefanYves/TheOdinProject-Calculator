@@ -1,35 +1,102 @@
-let firstNum;
-let secondNum;
-let operation;
-let sum;
-let num1 = document.querySelectorAll(".");
-let num2 = parseInt(prompt("What number2?"));
+let input = document.getElementById("input");
+let operator = document.querySelectorAll(".operators div");
+let clear = document.getElementById("clear");
+let number = document.querySelectorAll(".numbers div");
+let result = document.getElementById("result");
+let resultDisplayed = false;
 
-function operate(op) {
-  if (op === "+") {
-    add(num1, num2);
-  } else if (op === "-") {
-    subtract();
-  } else if (op === "*") {
-    multiply();
-  } else if (op === "/") {
-    divide();
-  } else console.log("ERROR");
+for (let i = 0; i < number.length; i++) {
+  number[i].addEventListener("click", (e) => {
+    let currentString = input.innerHTML;
+    let lastChar = currentString[currentString - 1];
 
-  return sum;
+    if (resultDisplayed === false) {
+      input.innerHTML += e.target.innerHTML;
+    } else if (
+      (resultDisplayed === true && lastChar === "-") ||
+      lastChar === "+" ||
+      lastChar === "×" ||
+      lastChar === "÷"
+    ) {
+      resultDisplayed = false;
+      input.innerHTML += e.target.innerHTML;
+    } else {
+      resultDisplayed = false;
+      input.innerHTML = "";
+      input.innerHTML += e.target.innerHTML;
+    }
+  });
 }
 
-console.log(operate("+"));
+for (let i = 0; i < operator.length; i++) {
+  operator[i].addEventListener("click", (e) => {
+    let currentString = input.innerHTML;
+    let lastChar = currentString[currentString - 1];
 
-function add(a, b) {
-  sum = a + b;
+    if (
+      lastChar === "-" ||
+      lastChar === "+" ||
+      lastChar === "×" ||
+      lastChar === "÷"
+    ) {
+      let newString =
+        currentString.substring(0, currentString.length - 1) +
+        e.target.innerHTML;
+      input.innerHTML = newString;
+    } else if (currentString === 0) {
+      alert("Enter a number first!");
+    } else input.innerHTML += e.target.innerHTML;
+  });
 }
-function subtract(a, b) {
-  sum = a - b;
-}
-function multiply(a, b) {
-  sum = a * b;
-}
-function divide(a, b) {
-  sum = a / b;
-}
+
+result.addEventListener("click", (e) => {
+  let inputString = input.innerHTML;
+
+  let numbers = inputString.split(/\+|\-|\×|\÷/g);
+
+  let operators = inputString.replace(/[0-9]|\./g, "").split("");
+
+  console.log(inputString);
+  console.log(numbers);
+  console.log(operators);
+
+  let divide = operators.indexOf("÷");
+  while (divide != -1) {
+    numbers.splice(divide, 2, numbers[divide] / numbers[divide + 1]);
+    operators.splice(divide, 1);
+    divide = operators.indexOf("÷");
+  }
+
+  let multiply = operators.indexOf("×");
+  while (multiply != -1) {
+    numbers.splice(multiply, 2, numbers[multiply] * numbers[multiply + 1]);
+    operators.splice(multiply, 1);
+    multiply = operators.indexOf("×");
+  }
+
+  let subtract = operators.indexOf("-");
+  while (subtract != -1) {
+    numbers.splice(subtract, 2, numbers[subtract] - numbers[subtract + 1]);
+    operators.splice(subtract, 1);
+    subtract = operators.indexOf("-");
+  }
+
+  let add = operators.indexOf("+");
+  while (add != -1) {
+    numbers.splice(
+      add,
+      2,
+      parseFloat(numbers[add]) + parseFloat(numbers[add + 1])
+    );
+    operators.splice(add, 1);
+    add = operators.indexOf("+");
+  }
+
+  input.innerHTML = numbers[0];
+
+  resultDisplayed = true;
+});
+
+clear.addEventListener("click", (e) => {
+  input.innerHTML = "";
+});
